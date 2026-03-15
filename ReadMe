@@ -1,0 +1,129 @@
+## Jak uruchomić projekt
+
+### 1. Pobierz projekt
+
+Wejdź na repozytorium GitHub:
+
+https://github.com/michel-naturel/Hotel-Backend/
+
+Kliknij:
+
+Code → Download ZIP
+
+Rozpakuj plik ZIP na komputerze.
+
+---
+
+### 2. Zainstaluj Node.js
+
+Jeśli nie masz Node.js:
+
+https://nodejs.org
+
+Pobierz i zainstaluj wersję **LTS**.
+
+---
+
+### 3. Uruchom backend
+
+Otwórz terminal w folderze projektu i wpisz:
+
+cd hotel-backend
+npm install
+node server.js
+
+Jeśli wszystko działa poprawnie zobaczysz:
+
+Server działa na porcie 3000
+
+Backend będzie dostępny pod adresem:
+
+http://localhost:3000
+
+---
+
+### 4. Uruchom frontend
+
+Otwórz w przeglądarce plik:
+
+index.html
+
+Frontend komunikuje się z backendem działającym na porcie 3000.
+
+---
+
+## Alternatywa (dla osób używających Git)
+
+git clone https://github.com/NAZWA_REPOZYTORIUM.git
+cd hotel-backend
+npm install
+node server.js
+
+---
+
+## Funkcje systemu
+
+- lista pokoi
+- dodawanie pokoi
+- sprawdzanie dostępności pokoi
+- tworzenie rezerwacji
+- usuwanie rezerwacji
+- podgląd rezerwacji dla pokoju
+
+---
+
+## Endpointy API
+
+GET /rooms  
+Lista wszystkich pokoi
+
+POST /rooms  
+Dodanie pokoju
+
+GET /rooms/available?checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD  
+Lista dostępnych pokoi w danym terminie
+
+GET /rooms/:id/reservations  
+Rezerwacje dla wybranego pokoju
+
+GET /reservations  
+Lista wszystkich rezerwacji
+
+POST /reservations  
+Dodanie rezerwacji
+
+DELETE /reservations/:id  
+Usunięcie rezerwacji
+
+---
+
+## Struktura projektu
+
+hotel-backend
+│
+├─ server.js
+├─ package.json
+│
+└─ src
+    ├─ app.js
+    ├─ routes
+    │   ├─ rooms.js
+    │   └─ reservations.js
+    │
+    ├─ controllers
+    │   ├─ roomsController.js
+    │   └─ reservationsController.js
+    │
+    └─ database
+        └─ db.js
+
+---
+
+## Wymagania
+
+- Node.js
+- npm
+
+Biblioteki instalują się automatycznie przez:
+
+npm install
