@@ -30,6 +30,7 @@ Otwórz terminal w folderze projektu i wpisz:
 
 cd hotel-backend
 npm install
+npm install sqlite3
 node server.js
 
 Jeśli wszystko działa poprawnie zobaczysz:

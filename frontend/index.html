@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hotel Admin</title>
+
+<style>
+
+body{
+font-family:Arial;
+max-width:900px;
+margin:auto;
+}
+
+button,input{
+margin:5px;
+padding:6px;
+}
+
+.box{
+border:1px solid #ccc;
+padding:10px;
+margin:10px 0;
+}
+
+.room{
+border:1px solid #ddd;
+padding:8px;
+margin:6px 0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Hotel Admin</h1>
+
+<h2>Pokoje</h2>
+
+<button onclick="loadRooms()">Pobierz pokoje</button>
+
+<div id="rooms"></div>
+
+<hr>
+
+<h2>Dodaj pokój</h2>
+
+<input id="roomNumber" placeholder="Numer pokoju">
+<input id="roomType" placeholder="Typ">
+<input id="roomPrice" placeholder="Cena">
+
+<button onclick="createRoom()">Dodaj pokój</button>
+
+<div id="roomResult"></div>
+
+<hr>
+
+<h2>Dostępne pokoje</h2>
+
+CheckIn
+<input type="date" id="checkIn">
+
+CheckOut
+<input type="date" id="checkOut">
+
+<button onclick="checkAvailable()">Sprawdź</button>
+
+<div id="available"></div>
+
+<hr>
+
+<h2>Wszystkie rezerwacje</h2>
+
+<button onclick="loadReservations()">Pobierz rezerwacje</button>
+
+<div id="reservations"></div>
+
+<hr>
+
+<h2>Nowa rezerwacja</h2>
+
+<input id="guestName" placeholder="Imię gościa">
+<input id="roomId" placeholder="Room ID">
+
+CheckIn
+<input type="date" id="rCheckIn">
+
+CheckOut
+<input type="date" id="rCheckOut">
+
+<button onclick="createReservation()">Zarezerwuj</button>
+
+<div id="result"></div>
+
+<script>
+
+const API="http://localhost:3000"
+
+async function loadRooms(){
+
+const res = await fetch(API+"/rooms")
+const rooms = await res.json()
+
+const container=document.getElementById("rooms")
+container.innerHTML=""
+
+rooms.forEach(r=>{
+
+container.innerHTML+=`
+<div class="room">
+
+<b>Pokój ${r.number}</b> (ID ${r.id})<br>
+Typ: ${r.type}<br>
+Cena: ${r.price}<br>
+
+<button onclick="showReservations(${r.id})">
+Pokaż rezerwacje
+</button>
+
+<div id="room-res-${r.id}"></div>
+
+</div>
+`
+
+})
+
+}
+
+async function showReservations(roomId){
+
+const res=await fetch(`${API}/rooms/${roomId}/reservations`)
+const reservations=await res.json()
+
+const container=document.getElementById(`room-res-${roomId}`)
+container.innerHTML=""
+
+reservations.forEach(r=>{
+
+container.innerHTML+=`
+<div>
+${r.guestName} : ${r.checkIn} → ${r.checkOut}
+</div>
+`
+
+})
+
+}
+
+async function createRoom(){
+
+const number=document.getElementById("roomNumber").value
+const type=document.getElementById("roomType").value
+const price=document.getElementById("roomPrice").value
+
+const res=await fetch(API+"/rooms",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+number,
+type,
+price:Number(price)
+})
+
+})
+
+const data=await res.json()
+
+document.getElementById("roomResult").innerText=JSON.stringify(data)
+
+}
+
+async function checkAvailable(){
+
+const checkIn=document.getElementById("checkIn").value
+const checkOut=document.getElementById("checkOut").value
+
+if(!checkIn || !checkOut){
+alert("Podaj daty check-in i check-out")
+return
+}
+
+if(checkOut <= checkIn){
+alert("Check-out musi być później niż check-in")
+return
+}
+
+const res=await fetch(`${API}/rooms/available?checkIn=${checkIn}&checkOut=${checkOut}`)
+
+const rooms=await res.json()
+
+const container=document.getElementById("available")
+container.innerHTML=""
+
+if(rooms.length === 0){
+container.innerHTML="Brak dostępnych pokoi"
+return
+}
+
+rooms.forEach(r=>{
+
+container.innerHTML+=`
+<div class="room">
+Pokój ${r.number} (ID ${r.id})
+</div>
+`
+
+})
+
+}
+
+async function loadReservations(){
+
+const res=await fetch(API+"/reservations")
+const reservations=await res.json()
+
+const container=document.getElementById("reservations")
+container.innerHTML=""
+
+reservations.forEach(r=>{
+
+container.innerHTML+=`
+
+<div class="box">
+
+<b>${r.guestName}</b><br>
+Pokój: ${r.roomId}<br>
+${r.checkIn} → ${r.checkOut}<br>
+
+<button onclick="deleteReservation(${r.id})">
+Usuń
+</button>
+
+</div>
+
+`
+
+})
+
+}
+
+async function deleteReservation(id){
+
+await fetch(API+"/reservations/"+id,{
+method:"DELETE"
+})
+
+loadReservations()
+
+}
+
+async function createReservation(){
+
+const guestName=document.getElementById("guestName").value
+const roomId=document.getElementById("roomId").value
+const checkIn=document.getElementById("rCheckIn").value
+const checkOut=document.getElementById("rCheckOut").value
+
+const res=await fetch(API+"/reservations",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+guestName,
+roomId:Number(roomId),
+checkIn,
+checkOut
+})
+
+})
+
+const data=await res.json()
+
+document.getElementById("result").innerText=JSON.stringify(data)
+
+}
+
+</script>
+
+</body>
+</html>
